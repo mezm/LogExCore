@@ -48,7 +48,7 @@ namespace ExtLog.NET.SingleLineConsoleLogger
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             var msg = formatter(state, exception);
-            var fullMessage = $"[{DateTime.Now}] {_levelMap[logLevel]} - {_name}: {msg}";
+            var fullMessage = $"[{DateTime.Now:hh:mm:ss.FFF}] {_levelMap[logLevel]} - {_name}: {msg}";
 
             var consoleMessage = new ConsoleMessage(fullMessage, _colorMap[logLevel]);
             _sink.Post(consoleMessage);
