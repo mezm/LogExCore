@@ -9,7 +9,7 @@ namespace ExtLog.NET.SingleLineConsoleLogger
     public class SingleLineConsoleLoggerProvider : ILoggerProvider // todo: support external scopes
     {
         private readonly ConcurrentDictionary<string, SingleLineConsoleLogger> _loggers = new ConcurrentDictionary<string, SingleLineConsoleLogger>();
-        private readonly ActionBlock<string> _sink = new ActionBlock<string>(RenderMessage);
+        private readonly ActionBlock<ConsoleMessage> _sink = new ActionBlock<ConsoleMessage>(RenderMessage);
 
         public ILogger CreateLogger(string categoryName) => _loggers.GetOrAdd(categoryName, x => new SingleLineConsoleLogger(x, _sink));
 
@@ -19,6 +19,12 @@ namespace ExtLog.NET.SingleLineConsoleLogger
             _sink.Completion.ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
-        private static void RenderMessage(string messasge) => Console.WriteLine(messasge);
+        private static void RenderMessage(ConsoleMessage msg)
+        {
+            var prevColor = Console.ForegroundColor;
+            Console.ForegroundColor = msg.ForegroundColor;
+            Console.WriteLine(msg.Message);
+            Console.ForegroundColor = prevColor;
+        }
     }
 }

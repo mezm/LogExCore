@@ -5,11 +5,10 @@ using System.Threading.Tasks.Dataflow;
 
 namespace ExtLog.NET.SingleLineConsoleLogger
 {
-    // todo: implement coloring
     public class SingleLineConsoleLogger : ILogger
     {
         private readonly string _name;
-        private readonly ITargetBlock<string> _sink;
+        private readonly ITargetBlock<ConsoleMessage> _sink;
 
         private readonly Dictionary<LogLevel, string> _levelMap = new Dictionary<LogLevel, string>
         {
@@ -22,7 +21,18 @@ namespace ExtLog.NET.SingleLineConsoleLogger
             [LogLevel.Critical] = "CRT"
         };
 
-        public SingleLineConsoleLogger(string name, ITargetBlock<string> sink)
+        private readonly Dictionary<LogLevel, ConsoleColor> _colorMap = new Dictionary<LogLevel, ConsoleColor>
+        {
+            [LogLevel.None] = ConsoleColor.DarkYellow,
+            [LogLevel.Trace] = ConsoleColor.Gray,
+            [LogLevel.Debug] = ConsoleColor.DarkGray,
+            [LogLevel.Information] = ConsoleColor.White,
+            [LogLevel.Warning] = ConsoleColor.Yellow,
+            [LogLevel.Error] = ConsoleColor.Red,
+            [LogLevel.Critical] = ConsoleColor.DarkRed
+        };
+
+        public SingleLineConsoleLogger(string name, ITargetBlock<ConsoleMessage> sink)
         {
             _name = name;
             _sink = sink;
@@ -39,7 +49,9 @@ namespace ExtLog.NET.SingleLineConsoleLogger
         {
             var msg = formatter(state, exception);
             var fullMessage = $"[{DateTime.Now}] {_levelMap[logLevel]} - {_name}: {msg}";
-            _sink.Post(fullMessage);
+
+            var consoleMessage = new ConsoleMessage(fullMessage, _colorMap[logLevel]);
+            _sink.Post(consoleMessage);
         }
     }
 }
