@@ -18,9 +18,9 @@ namespace ExtLog.NET.Sample
                     .AddFilter("Microsoft", LogLevel.Warning)
                     .AddFilter("System", LogLevel.Warning)
                     .AddFilter("ExtLog.NET.Sample", LogLevel.Debug)
-                    .AddSingleLineConsole();
-                    //.AddConsole();
+                    .AddSingleLineConsole(x => x.ShowFullLoggerName = true);
             });
+            // todo: test config from file
 
             _logger = loggerFactory.CreateLogger<Program>();
 

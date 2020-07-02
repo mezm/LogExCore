@@ -4,7 +4,7 @@ namespace ExtLog.NET.SingleLineConsoleLogger
 {
     public struct ConsoleMessage
     {
-        public ConsoleMessage(string message, ConsoleColor foregroundColor)
+        public ConsoleMessage(string message, ConsoleColor? foregroundColor)
         {
             Message = message;
             ForegroundColor = foregroundColor;
@@ -12,6 +12,6 @@ namespace ExtLog.NET.SingleLineConsoleLogger
 
         public string Message { get; }
 
-        public ConsoleColor ForegroundColor { get; }
+        public ConsoleColor? ForegroundColor { get; }
     }
 }

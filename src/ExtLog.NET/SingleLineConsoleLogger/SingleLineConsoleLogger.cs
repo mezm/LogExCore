@@ -5,12 +5,13 @@ using System.Threading.Tasks.Dataflow;
 
 namespace ExtLog.NET.SingleLineConsoleLogger
 {
-    public class SingleLineConsoleLogger : ILogger
+    internal class SingleLineConsoleLogger : ILogger
     {
-        private readonly string _name;
+        private readonly string _fullName;
+        private readonly string _shortName;
         private readonly ITargetBlock<ConsoleMessage> _sink;
 
-        private readonly Dictionary<LogLevel, string> _levelMap = new Dictionary<LogLevel, string>
+        private static readonly Dictionary<LogLevel, string> LevelMap = new Dictionary<LogLevel, string>
         {
             [LogLevel.None] = "---",
             [LogLevel.Trace] = "TRC",
@@ -21,7 +22,7 @@ namespace ExtLog.NET.SingleLineConsoleLogger
             [LogLevel.Critical] = "CRT"
         };
 
-        private readonly Dictionary<LogLevel, ConsoleColor> _colorMap = new Dictionary<LogLevel, ConsoleColor>
+        private static readonly Dictionary<LogLevel, ConsoleColor> ColorMap = new Dictionary<LogLevel, ConsoleColor>
         {
             [LogLevel.None] = ConsoleColor.DarkYellow,
             [LogLevel.Trace] = ConsoleColor.Gray,
@@ -34,9 +35,12 @@ namespace ExtLog.NET.SingleLineConsoleLogger
 
         public SingleLineConsoleLogger(string name, ITargetBlock<ConsoleMessage> sink)
         {
-            _name = name;
+            _fullName = name;
+            _shortName = GetShortLoggerName(name);
             _sink = sink;
         }
+
+        public SingleLineConsoleLoggerOptions Options { get; set; } = SingleLineConsoleLoggerOptions.Default;
 
         public IDisposable BeginScope<TState>(TState state)
         {
@@ -48,10 +52,21 @@ namespace ExtLog.NET.SingleLineConsoleLogger
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             var msg = formatter(state, exception);
-            var fullMessage = $"[{DateTime.Now:hh:mm:ss.FFF}] {_levelMap[logLevel]} - {_name}: {msg}";
+            var timeFormat = Options.HideMilliseconds ? "HH:mm:ss" : "HH:mm:ss.fff";
+            var time = DateTime.Now.ToString(timeFormat);
+            var loggerName = Options.ShowFullLoggerName ? _fullName : _shortName;
 
-            var consoleMessage = new ConsoleMessage(fullMessage, _colorMap[logLevel]);
+            var fullMessage = $"{time} {LevelMap[logLevel]} [{loggerName}] {msg}";
+            var foregroundColor = Options.DisableColors ? (ConsoleColor?)null : ColorMap[logLevel];
+            var consoleMessage = new ConsoleMessage(fullMessage, foregroundColor);
+
             _sink.Post(consoleMessage);
+        }
+
+        private static string GetShortLoggerName(string name)
+        {
+            var index = name.LastIndexOf('.');
+            return index > -1 ? name.Substring(index + 1) : name;
         }
     }
 }
