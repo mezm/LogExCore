@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading;
@@ -8,21 +9,22 @@ namespace ExtLog.NET.Sample
 {
     public class Program
     {
-        private static ILogger _logger;
+        private static ILogger Logger;
 
         public static void Main(string[] args)
         {
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+
             var loggerFactory = LoggerFactory.Create(builder =>
             {
                 builder
-                    .AddFilter("Microsoft", LogLevel.Warning)
-                    .AddFilter("System", LogLevel.Warning)
-                    .AddFilter("ExtLog.NET.Sample", LogLevel.Debug)
-                    .AddSingleLineConsole(x => x.ShowFullLoggerName = true);
+                    .AddConfiguration(config.GetSection("Logging"))
+                    .AddSingleLineConsole();
             });
-            // todo: test config from file
 
-            _logger = loggerFactory.CreateLogger<Program>();
+            Logger = loggerFactory.CreateLogger<Program>();
 
             var cancelation = new CancellationTokenSource();
             var tasks = Enum.GetValues(typeof(LogLevel))
@@ -41,7 +43,7 @@ namespace ExtLog.NET.Sample
             var random = new Random((int)DateTime.Now.Ticks);
             while (!token.IsCancellationRequested)
             {
-                _logger.Log(level, "Message with tick {ticks}", DateTime.Now.Ticks);
+                Logger.Log(level, "Message with tick {ticks}", DateTime.Now.Ticks);
                 var delay = random.Next(100, 5000);
                 await Task.Delay(delay);
             }
