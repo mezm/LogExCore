@@ -1,4 +1,4 @@
-﻿namespace ExtLog.NET.SingleLineConsoleLogger
+﻿namespace LogExCore.SingleLineConsoleLogger
 {
     public class SingleLineConsoleLoggerOptions
     {

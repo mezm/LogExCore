@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks.Dataflow;
 
-namespace ExtLog.NET.SingleLineConsoleLogger
+namespace LogExCore.SingleLineConsoleLogger
 {
     internal class SingleLineConsoleLogger : ILogger
     {

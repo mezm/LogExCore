@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ExtLog.NET.Sample
+namespace LogExCore.Sample
 {
     public class Program
     {

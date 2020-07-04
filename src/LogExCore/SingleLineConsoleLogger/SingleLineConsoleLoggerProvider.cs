@@ -4,7 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks.Dataflow;
 
-namespace ExtLog.NET.SingleLineConsoleLogger
+namespace LogExCore.SingleLineConsoleLogger
 {
     [ProviderAlias("SingleLineConsole")]
     public class SingleLineConsoleLoggerProvider : ILoggerProvider // todo: support external scopes

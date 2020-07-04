@@ -1,10 +1,10 @@
-﻿using ExtLog.NET.SingleLineConsoleLogger;
+﻿using LogExCore.SingleLineConsoleLogger;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Configuration;
 using System;
 
-namespace ExtLog.NET
+namespace LogExCore
 {
     public static class LoggingBuilderExtensions
     {
