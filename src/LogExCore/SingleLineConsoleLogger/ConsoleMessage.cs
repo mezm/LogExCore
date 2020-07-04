@@ -2,9 +2,9 @@
 
 namespace LogExCore.SingleLineConsoleLogger
 {
-    public struct ConsoleMessage
+    internal struct ConsoleMessage
     {
-        public ConsoleMessage(string message, ConsoleColor? foregroundColor)
+        public ConsoleMessage(string message, ConsoleColor foregroundColor)
         {
             Message = message;
             ForegroundColor = foregroundColor;
@@ -12,6 +12,6 @@ namespace LogExCore.SingleLineConsoleLogger
 
         public string Message { get; }
 
-        public ConsoleColor? ForegroundColor { get; }
+        public ConsoleColor ForegroundColor { get; }
     }
 }

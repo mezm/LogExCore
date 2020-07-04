@@ -1,15 +1,32 @@
-﻿namespace LogExCore.SingleLineConsoleLogger
+﻿using System;
+
+namespace LogExCore.SingleLineConsoleLogger
 {
+    /// <summary>
+    /// Single Line Console Logger Options
+    /// </summary>
     public class SingleLineConsoleLoggerOptions
     {
+        /// <summary>
+        /// Disable message coloring depending on log level
+        /// </summary>
         public bool DisableColors { get; set; }
 
-        public bool HideMilliseconds { get; set; }
+        /// <summary>
+        /// Timestamps format 
+        /// </summary>
+        public TimestampFormat TimestampFormat { get; set; } = TimestampFormat.TimeMs;
 
-        public bool HideLoggerName { get; set; }
+        /// <summary>
+        /// Whether to show full logger name or only class name
+        /// </summary>
+        public bool FullLoggerName { get; set; }
 
-        public bool ShowFullLoggerName { get; set; }
+        /// <summary>
+        /// What elements of message should be hidden 
+        /// </summary>
+        public LogMessageParts[] Hide { get; set; } = Array.Empty<LogMessageParts>();
 
-        public static SingleLineConsoleLoggerOptions Default { get; } = new SingleLineConsoleLoggerOptions();
+        internal static SingleLineConsoleLoggerOptions Default { get; } = new SingleLineConsoleLoggerOptions();
     }
 }

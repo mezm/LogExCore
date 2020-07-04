@@ -11,7 +11,7 @@ namespace LogExCore.SingleLineConsoleLogger
     {
         private readonly IOptionsMonitor<SingleLineConsoleLoggerOptions> _options;
         private readonly ConcurrentDictionary<string, SingleLineConsoleLogger> _loggers = new ConcurrentDictionary<string, SingleLineConsoleLogger>();
-        private readonly ActionBlock<ConsoleMessage> _sink = new ActionBlock<ConsoleMessage>(RenderMessage);
+        private readonly ActionBlock<ConsoleMessage> _sink;
 
         private readonly IDisposable _optionsReloadToken;
 
@@ -19,11 +19,12 @@ namespace LogExCore.SingleLineConsoleLogger
         {
             _options = options;
             _optionsReloadToken = _options.OnChange(ReloadOptions);
+            _sink = new ActionBlock<ConsoleMessage>(RenderMessage);
         }
 
         public ILogger CreateLogger(string categoryName)
         {
-            return _loggers.GetOrAdd(categoryName, x => new SingleLineConsoleLogger(x, _sink) { Options = _options.CurrentValue });
+            return _loggers.GetOrAdd(categoryName, x => new SingleLineConsoleLogger(x, _sink).WithOptions(_options.CurrentValue));
         }
 
         public void Dispose()
@@ -34,12 +35,12 @@ namespace LogExCore.SingleLineConsoleLogger
             _sink.Completion.ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
-        private static void RenderMessage(ConsoleMessage msg)
+        private void RenderMessage(ConsoleMessage msg) // todo: move to separate class
         {
-            if (msg.ForegroundColor.HasValue)
+            if (!_options.CurrentValue.DisableColors)
             {
                 var prevColor = Console.ForegroundColor;
-                Console.ForegroundColor = msg.ForegroundColor.Value;
+                Console.ForegroundColor = msg.ForegroundColor;
                 Console.WriteLine(msg.Message);
                 Console.ForegroundColor = prevColor;
             } 
@@ -53,7 +54,7 @@ namespace LogExCore.SingleLineConsoleLogger
         {
             foreach (var logger in _loggers)
             {
-                logger.Value.Options = options;
+                logger.Value.WithOptions(options);
             }
         }
     }
