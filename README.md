@@ -1,6 +1,14 @@
+![Build and Run Tests](https://github.com/mezm/LogExCore/workflows/Build%20and%20Run%20Tests/badge.svg?branch=master)
+
 # LogExCore
 **LogExCore** is a library that extends `Microsoft.Extensions.Logging`.
 Now it contains only `SingleLineConsoleLogger`. But there are plans to add few more, for example `FileLogger`
+
+# Install
+To install **LogExCore** run:
+```
+Install-Package LogExCore
+```
 
 # Loggers
 ## SingleLineConsoleLogger
