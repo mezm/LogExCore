@@ -18,6 +18,11 @@ namespace LogExCore.SingleLineConsoleLogger
         public TimestampFormat TimestampFormat { get; set; } = TimestampFormat.TimeMs;
 
         /// <summary>
+        /// Log level code format
+        /// </summary>
+        public LogLevelFormat LevelFormat { get; set; } = LogLevelFormat.L3;
+
+        /// <summary>
         /// Whether to show full logger name or only class name
         /// </summary>
         public bool FullLoggerName { get; set; }

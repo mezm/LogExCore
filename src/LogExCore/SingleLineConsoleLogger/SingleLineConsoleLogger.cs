@@ -57,9 +57,20 @@ namespace LogExCore.SingleLineConsoleLogger
 
         private class Formatter
         {
-            private static readonly Dictionary<LogLevel, string> LevelMap = new Dictionary<LogLevel, string>
+            private static readonly Dictionary<LogLevel, string> OneLeterLevelMap = new Dictionary<LogLevel, string>
             {
-                [LogLevel.None] = "---",
+                [LogLevel.None] = "N",
+                [LogLevel.Trace] = "T",
+                [LogLevel.Debug] = "D",
+                [LogLevel.Information] = "I",
+                [LogLevel.Warning] = "W",
+                [LogLevel.Error] = "E",
+                [LogLevel.Critical] = "C"
+            };
+
+            private static readonly Dictionary<LogLevel, string> ThreeLeterLevelMap = new Dictionary<LogLevel, string>
+            {
+                [LogLevel.None] = "NON",
                 [LogLevel.Trace] = "TRC",
                 [LogLevel.Debug] = "DBG",
                 [LogLevel.Information] = "INF",
@@ -68,14 +79,27 @@ namespace LogExCore.SingleLineConsoleLogger
                 [LogLevel.Critical] = "CRT"
             };
 
+            private static readonly Dictionary<LogLevel, string> FullLevelMap = new Dictionary<LogLevel, string>
+            {
+                [LogLevel.None] = "NONE ",
+                [LogLevel.Trace] = "TRACE",
+                [LogLevel.Debug] = "DEBUG",
+                [LogLevel.Information] = "INFO ",
+                [LogLevel.Warning] = "WARN ",
+                [LogLevel.Error] = "ERROR",
+                [LogLevel.Critical] = "CRIT "
+            };
+
             private readonly string _timestampFormat;
             private readonly string _loggerName;
             private readonly string _template;
+            private readonly Dictionary<LogLevel, string> _levelMap;
 
             public Formatter(string name, SingleLineConsoleLoggerOptions options)
             {
                 _loggerName = options.FullLoggerName ? name : GetShortLoggerName(name);
                 _timestampFormat = GetDateTimeFormat(options.TimestampFormat);
+                _levelMap = GetLogLevelMapping(options.LevelFormat);
 
                 var templateBuilder = new StringBuilder();
                 if (!options.Hide.Contains(LogMessageParts.Timestamp)) templateBuilder.Append("{0} ");
@@ -87,7 +111,7 @@ namespace LogExCore.SingleLineConsoleLogger
 
             public string Format(DateTime timestamp, LogLevel level, string message)
             {
-                return string.Format(_template, timestamp.ToString(_timestampFormat), LevelMap[level], _loggerName, message);
+                return string.Format(_template, timestamp.ToString(_timestampFormat), _levelMap[level], _loggerName, message);
             }
 
             private static string GetDateTimeFormat(TimestampFormat format)
@@ -103,6 +127,21 @@ namespace LogExCore.SingleLineConsoleLogger
                 }
 
                 return "";
+            }
+
+            private static Dictionary<LogLevel, string> GetLogLevelMapping(LogLevelFormat format)
+            {
+                switch (format)
+                {
+                    case LogLevelFormat.L1:
+                        return OneLeterLevelMap;
+                    case LogLevelFormat.L3:
+                        return ThreeLeterLevelMap;
+                    case LogLevelFormat.Full:
+                        return FullLevelMap;
+                }
+
+                return null;
             }
 
             private static string GetShortLoggerName(string name)
