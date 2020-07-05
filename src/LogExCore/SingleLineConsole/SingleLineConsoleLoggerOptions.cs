@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LogExCore.SingleLineConsoleLogger
+namespace LogExCore.SingleLineConsole
 {
     /// <summary>
     /// Single Line Console Logger Options
