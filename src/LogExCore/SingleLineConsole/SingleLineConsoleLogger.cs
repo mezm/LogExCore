@@ -23,24 +23,21 @@ namespace LogExCore.SingleLineConsole
         };
 
         private Formatter _formatter;
+        private IExternalScopeProvider _scopeProvider;
 
-        public SingleLineConsoleLogger(string name, ISingleLineConsoleLoggerSink sink)
+        public SingleLineConsoleLogger(string name, ISingleLineConsoleLoggerSink sink, SingleLineConsoleLoggerOptions options, IExternalScopeProvider scopeProvider)
         {
             _name = name;
             _sink = sink;
+            _scopeProvider = scopeProvider;
             WithOptions(SingleLineConsoleLoggerOptions.Default);
         }
 
-        public SingleLineConsoleLogger WithOptions(SingleLineConsoleLoggerOptions options)
-        {
-            _formatter = new Formatter(_name, options);
-            return this;
-        }
+        public void WithOptions(SingleLineConsoleLoggerOptions options) => _formatter = new Formatter(_name, options);
 
-        public IDisposable BeginScope<TState>(TState state)
-        {
-            throw new NotSupportedException(); // todo: implement
-        }
+        public void WithScopeProvider(IExternalScopeProvider scopeProvider) => _scopeProvider = scopeProvider;
+
+        public IDisposable BeginScope<TState>(TState state) => _scopeProvider?.Push(state);
 
         public bool IsEnabled(LogLevel logLevel) => logLevel != LogLevel.None;
 
