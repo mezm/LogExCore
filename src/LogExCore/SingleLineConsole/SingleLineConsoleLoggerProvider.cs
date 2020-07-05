@@ -2,17 +2,20 @@
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
 
 namespace LogExCore.SingleLineConsole
 {
     [ProviderAlias("SingleLineConsole")]
-    public partial class SingleLineConsoleLoggerProvider : ILoggerProvider // todo: support external scopes
+    public partial class SingleLineConsoleLoggerProvider : ILoggerProvider, ISupportExternalScope
     {
         private readonly IOptionsMonitor<SingleLineConsoleLoggerOptions> _options;
         private readonly ConcurrentDictionary<string, SingleLineConsoleLogger> _loggers = new ConcurrentDictionary<string, SingleLineConsoleLogger>();
         private readonly SingleLineConsoleLoggerSink _sink = new SingleLineConsoleLoggerSink();
 
         private readonly IDisposable _optionsReloadToken;
+
+        private IExternalScopeProvider _scopeProvider = DummyExternalScopeProvider.Instance;
 
         public SingleLineConsoleLoggerProvider(IOptionsMonitor<SingleLineConsoleLoggerOptions> options)
         {
@@ -22,18 +25,21 @@ namespace LogExCore.SingleLineConsole
 
         public ILogger CreateLogger(string categoryName)
         {
-            return _loggers.GetOrAdd(categoryName, x => new SingleLineConsoleLogger(x, _sink).WithOptions(_options.CurrentValue));
+            return _loggers.GetOrAdd(categoryName, x => new SingleLineConsoleLogger(x, _sink, _options.CurrentValue, _scopeProvider));
         }
 
         public void Dispose() => _optionsReloadToken?.Dispose();
 
+        public void SetScopeProvider(IExternalScopeProvider scopeProvider)
+        {
+            _scopeProvider = scopeProvider;
+            _loggers.Values.ToList().ForEach(x => x.WithScopeProvider(scopeProvider));
+        }
+
         private void ReloadOptions(SingleLineConsoleLoggerOptions options)
         {
             _sink.Options = options;
-            foreach (var logger in _loggers)
-            {
-                logger.Value.WithOptions(options);
-            }
+            _loggers.Values.ToList().ForEach(x => x.WithOptions(options));
         }
     }
 }

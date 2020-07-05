@@ -18,7 +18,7 @@ namespace LogExCore.Tests.SingleLineConsole
         public void Init()
         {
             _sink = Substitute.For<ISingleLineConsoleLoggerSink>();
-            _logger = new SingleLineConsoleLogger(GetType().FullName, _sink);
+            _logger = new SingleLineConsoleLogger(GetType().FullName, _sink, SingleLineConsoleLoggerOptions.Default, DummyExternalScopeProvider.Instance);
         }
 
         [Test]
