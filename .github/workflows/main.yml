@@ -26,3 +26,4 @@ jobs:
       
     - name: Test
       run: dotnet test --no-restore --verbosity normal
+      working-directory: ./src
