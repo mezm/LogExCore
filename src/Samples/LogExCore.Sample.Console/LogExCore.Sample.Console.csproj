@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LogExCore\LogExCore.csproj" />
+    <ProjectReference Include="..\..\LogExCore\LogExCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace LogExCore.Sample
+namespace LogExCore.Sample.Console
 {
     public class Program
     {
@@ -31,8 +31,8 @@ namespace LogExCore.Sample
                 .OfType<LogLevel>()
                 .Select(x => RunLogProcessAsync(x, cancelation.Token))
                 .ToArray();
-            
-            Console.ReadLine();
+
+            System.Console.ReadLine();
             cancelation.Cancel();
 
             Task.WaitAll(tasks);
