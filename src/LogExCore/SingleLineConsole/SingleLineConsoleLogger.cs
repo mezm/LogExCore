@@ -13,13 +13,13 @@ namespace LogExCore.SingleLineConsole
 
         private static readonly Dictionary<LogLevel, ConsoleColor> ColorMap = new Dictionary<LogLevel, ConsoleColor>
         {
-            [LogLevel.None] = ConsoleColor.DarkYellow,
-            [LogLevel.Trace] = ConsoleColor.Gray,
+            [LogLevel.None] = ConsoleColor.Cyan,
+            [LogLevel.Trace] = ConsoleColor.DarkCyan,
             [LogLevel.Debug] = ConsoleColor.DarkGray,
             [LogLevel.Information] = ConsoleColor.White,
-            [LogLevel.Warning] = ConsoleColor.Yellow,
-            [LogLevel.Error] = ConsoleColor.Red,
-            [LogLevel.Critical] = ConsoleColor.DarkRed
+            [LogLevel.Warning] = ConsoleColor.DarkYellow,
+            [LogLevel.Error] = ConsoleColor.DarkRed,
+            [LogLevel.Critical] = ConsoleColor.Red
         };
 
         private Formatter _formatter;
