@@ -38,5 +38,5 @@ using LogExCore;
 
 ...
 
-var loggerFactory = LoggerFactory.Create(builder => builder.AddSingleLineConsole()});
+var loggerFactory = LoggerFactory.Create(builder => builder.AddSingleLineConsole());
 var logger = loggerFactory.CreateLogger<Program>();
