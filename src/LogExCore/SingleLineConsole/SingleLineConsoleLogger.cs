@@ -3,29 +3,28 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks.Dataflow;
 
-namespace LogExCore.SingleLineConsoleLogger
+namespace LogExCore.SingleLineConsole
 {
     internal class SingleLineConsoleLogger : ILogger
     {
         private readonly string _name;
-        private readonly ITargetBlock<ConsoleMessage> _sink;
+        private readonly ISingleLineConsoleLoggerSink _sink;
 
         private static readonly Dictionary<LogLevel, ConsoleColor> ColorMap = new Dictionary<LogLevel, ConsoleColor>
         {
-            [LogLevel.None] = ConsoleColor.DarkYellow,
-            [LogLevel.Trace] = ConsoleColor.Gray,
+            [LogLevel.None] = ConsoleColor.Cyan,
+            [LogLevel.Trace] = ConsoleColor.DarkCyan,
             [LogLevel.Debug] = ConsoleColor.DarkGray,
             [LogLevel.Information] = ConsoleColor.White,
-            [LogLevel.Warning] = ConsoleColor.Yellow,
-            [LogLevel.Error] = ConsoleColor.Red,
-            [LogLevel.Critical] = ConsoleColor.DarkRed
+            [LogLevel.Warning] = ConsoleColor.DarkYellow,
+            [LogLevel.Error] = ConsoleColor.DarkRed,
+            [LogLevel.Critical] = ConsoleColor.Red
         };
 
         private Formatter _formatter;
 
-        public SingleLineConsoleLogger(string name, ITargetBlock<ConsoleMessage> sink)
+        public SingleLineConsoleLogger(string name, ISingleLineConsoleLoggerSink sink)
         {
             _name = name;
             _sink = sink;
@@ -52,7 +51,7 @@ namespace LogExCore.SingleLineConsoleLogger
             var foregroundColor = ColorMap[logLevel];
             var consoleMessage = new ConsoleMessage(fullMessage, foregroundColor);
 
-            _sink.Post(consoleMessage);
+            _sink.Push(consoleMessage);
         }
 
         private class Formatter
