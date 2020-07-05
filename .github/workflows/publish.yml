@@ -27,9 +27,9 @@ jobs:
       run: dotnet build --configuration Release 
       working-directory: ./src
         
-    # - name: Run tests
-    #   run: dotnet test --no-build -v n --configuration Release
-    #   working-directory: ./src
+    - name: Run tests
+      run: dotnet test --no-build -v n --configuration Release
+      working-directory: ./src
 
     - name: Pack NuGet package
       run: dotnet pack -p:PackageVersion=$VERSION --configuration Release --no-build
