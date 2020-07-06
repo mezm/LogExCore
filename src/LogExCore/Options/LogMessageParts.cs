@@ -1,4 +1,4 @@
-﻿namespace LogExCore
+﻿namespace LogExCore.Options
 {
     /// <summary>
     /// Parts of log message

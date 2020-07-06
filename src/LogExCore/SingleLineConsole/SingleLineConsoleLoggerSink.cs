@@ -1,36 +1,65 @@
-﻿using System;
+﻿using LogExCore.Options;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks.Dataflow;
 
 namespace LogExCore.SingleLineConsole
 {
-    internal class SingleLineConsoleLoggerSink : ISingleLineConsoleLoggerSink, IDisposable
+    internal class SingleLineConsoleLoggerSink : ILoggerSink, IDisposable
     {
-        private readonly ActionBlock<ConsoleMessage> _sink;
+        private readonly ActionBlock<ConsoleMessage> _renderer;
+        private readonly TransformManyBlock<LogMessageEntry, ConsoleMessage> _sink;
 
-        public SingleLineConsoleLoggerSink() => _sink = new ActionBlock<ConsoleMessage>(RenderMessage);
+        private SingleLineConsoleLoggerOptions _options = SingleLineConsoleLoggerOptions.Default;
+        private SingleLineConsoleMessageFormatter _formatter;
 
-        public SingleLineConsoleLoggerOptions Options { get; set; } = SingleLineConsoleLoggerOptions.Default;
+        public SingleLineConsoleLoggerSink()
+        {
+            _renderer = new ActionBlock<ConsoleMessage>(RenderMessage);
+            _sink = new TransformManyBlock<LogMessageEntry, ConsoleMessage>(ProcessMessage, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 100 });
 
-        public void Push(ConsoleMessage message) => _sink.Post(message);
+            var linkOptions = new DataflowLinkOptions { PropagateCompletion = true };
+            _sink.LinkTo(_renderer, linkOptions);
+
+            WithOptions(_options);
+        }
+
+        public void WithOptions(SingleLineConsoleLoggerOptions options)
+        {
+            _options = options;
+            _formatter = new SingleLineConsoleMessageFormatter(options);
+        }
+
+        public void Push(LogMessageEntry message) => _sink.Post(message);
 
         public void Dispose()
         {
             _sink.Complete();
-            _sink.Completion.ConfigureAwait(false).GetAwaiter().GetResult();
+            _renderer.Completion.ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+        private IEnumerable<ConsoleMessage> ProcessMessage(LogMessageEntry entry)
+        {
+            return _formatter.FormatByParts(entry);
         }
 
         private void RenderMessage(ConsoleMessage msg)
         {
-            if (!Options.DisableColors)
+            if (msg.ForegroundColor.HasValue && Console.ForegroundColor != msg.ForegroundColor.Value)
             {
                 var prevColor = Console.ForegroundColor;
-                Console.ForegroundColor = msg.ForegroundColor;
-                Console.WriteLine(msg.Message);
+                Console.ForegroundColor = msg.ForegroundColor.Value;
+                Console.Write(msg.Text);
                 Console.ForegroundColor = prevColor;
             }
             else
             {
-                Console.WriteLine(msg.Message);
+                Console.Write(msg.Text); 
+            }
+
+            if (msg.NewLine)
+            {
+                Console.WriteLine();
             }
         }
     }

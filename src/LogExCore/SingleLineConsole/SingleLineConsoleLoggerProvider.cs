@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using LogExCore.Options;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
@@ -36,10 +37,6 @@ namespace LogExCore.SingleLineConsole
             _loggers.Values.ToList().ForEach(x => x.WithScopeProvider(scopeProvider));
         }
 
-        private void ReloadOptions(SingleLineConsoleLoggerOptions options)
-        {
-            _sink.Options = options;
-            _loggers.Values.ToList().ForEach(x => x.WithOptions(options));
-        }
+        private void ReloadOptions(SingleLineConsoleLoggerOptions options) => _sink.WithOptions(options);
     }
 }

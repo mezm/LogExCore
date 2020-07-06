@@ -1,4 +1,5 @@
-﻿using LogExCore.SingleLineConsole;
+﻿using LogExCore.Options;
+using LogExCore.SingleLineConsole;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Configuration;

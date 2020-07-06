@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using LogExCore.Options;
 using LogExCore.SingleLineConsole;
 using Microsoft.Extensions.Options;
 using NSubstitute;
