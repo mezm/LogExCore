@@ -12,7 +12,7 @@ namespace LogExCore.SingleLineConsole
     {
         private readonly IOptionsMonitor<SingleLineConsoleLoggerOptions> _options;
         private readonly ConcurrentDictionary<string, SingleLineConsoleLogger> _loggers = new ConcurrentDictionary<string, SingleLineConsoleLogger>();
-        private readonly SingleLineConsoleLoggerSink _sink = new SingleLineConsoleLoggerSink();
+        private readonly SingleLineConsoleLoggerSink _sink;
 
         private readonly IDisposable _optionsReloadToken;
 
@@ -22,6 +22,7 @@ namespace LogExCore.SingleLineConsole
         {
             _options = options;
             _optionsReloadToken = _options.OnChange(ReloadOptions);
+            _sink = new SingleLineConsoleLoggerSink(_options.CurrentValue);
         }
 
         public ILogger CreateLogger(string categoryName)

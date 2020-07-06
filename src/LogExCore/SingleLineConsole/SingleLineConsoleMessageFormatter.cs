@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace LogExCore.SingleLineConsole
 {
@@ -11,8 +10,8 @@ namespace LogExCore.SingleLineConsole
     {
         private static readonly Dictionary<LogLevel, ConsoleColor> ColorMap = new Dictionary<LogLevel, ConsoleColor>
         {
-            [LogLevel.None] = ConsoleColor.Cyan,
-            [LogLevel.Trace] = ConsoleColor.DarkCyan,
+            [LogLevel.None] = ConsoleColor.Gray,
+            [LogLevel.Trace] = ConsoleColor.Gray,
             [LogLevel.Debug] = ConsoleColor.DarkGray,
             [LogLevel.Information] = ConsoleColor.White,
             [LogLevel.Warning] = ConsoleColor.DarkYellow,
@@ -54,38 +53,36 @@ namespace LogExCore.SingleLineConsole
         };
 
         private readonly string _timestampFormat;
-        private readonly string _template;
-        private readonly bool _fullLoggerName;
         private readonly Dictionary<LogLevel, string> _levelMap;
+        private readonly SingleLineConsoleLoggerOptions _options;
 
         public SingleLineConsoleMessageFormatter(SingleLineConsoleLoggerOptions options)
         {
             _timestampFormat = GetDateTimeFormat(options.TimestampFormat);
             _levelMap = GetLogLevelMapping(options.LevelFormat);
-            _fullLoggerName = options.FullLoggerName;
-
-            var templateBuilder = new StringBuilder();
-            if (!options.Hide.Contains(LogMessageParts.Timestamp)) templateBuilder.Append("{0} ");
-            if (!options.Hide.Contains(LogMessageParts.Level)) templateBuilder.Append("{1} ");
-            if (!options.Hide.Contains(LogMessageParts.Logger)) templateBuilder.Append("[{2}] ");
-            templateBuilder.Append("{3}");
-            _template = templateBuilder.ToString();
+            _options = options;
         }
 
-        public ConsoleMessage FormatFull(LogMessageEntry entry)
+        public IEnumerable<ConsoleMessage> FormatMessageParts(LogMessageEntry entry)
         {
-            var text = string.Format(_template, entry.Timestamp.ToString(_timestampFormat), _levelMap[entry.Level], GetLoggerName(entry.LoggerName), entry.Message);
-            var color = ColorMap[entry.Level];
-            return new ConsoleMessage(text, color);
-        }
+            var highlightColor = _options.DisableColors ? (ConsoleColor?)null : ColorMap[entry.Level];
 
-        public IEnumerable<ConsoleMessage> FormatByParts(LogMessageEntry entry)
-        {
-            // todo: filter hidden fields
-            yield return new ConsoleMessage(entry.Timestamp.ToString(_timestampFormat));
-            yield return new ConsoleMessage(_levelMap[entry.Level], ColorMap[entry.Level]);
-            yield return new ConsoleMessage(GetLoggerName(entry.LoggerName));
-            yield return new ConsoleMessage(entry.Message, newLine: true);
+            if (!_options.Hide.Contains(LogMessageParts.Timestamp))
+            {
+                yield return new ConsoleMessage(entry.Timestamp.ToString(_timestampFormat));
+            }
+
+            if (!_options.Hide.Contains(LogMessageParts.Level))
+            {
+                yield return new ConsoleMessage(_levelMap[entry.Level], highlightColor);
+            }
+
+            if (!_options.Hide.Contains(LogMessageParts.Logger))
+            {
+                yield return new ConsoleMessage($"[{GetLoggerName(entry.LoggerName)}]");
+            }
+
+            yield return new ConsoleMessage(entry.Message, highlightColor, newLine: true);
         }
 
         private static string GetDateTimeFormat(TimestampFormat format)
@@ -120,7 +117,7 @@ namespace LogExCore.SingleLineConsole
 
         private string GetLoggerName(string name)
         {
-            if (_fullLoggerName)
+            if (_options.FullLoggerName)
             {
                 return name;
             }

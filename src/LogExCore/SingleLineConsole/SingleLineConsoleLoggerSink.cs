@@ -10,10 +10,9 @@ namespace LogExCore.SingleLineConsole
         private readonly ActionBlock<ConsoleMessage> _renderer;
         private readonly TransformManyBlock<LogMessageEntry, ConsoleMessage> _sink;
 
-        private SingleLineConsoleLoggerOptions _options = SingleLineConsoleLoggerOptions.Default;
         private SingleLineConsoleMessageFormatter _formatter;
 
-        public SingleLineConsoleLoggerSink()
+        public SingleLineConsoleLoggerSink(SingleLineConsoleLoggerOptions options)
         {
             _renderer = new ActionBlock<ConsoleMessage>(RenderMessage);
             _sink = new TransformManyBlock<LogMessageEntry, ConsoleMessage>(ProcessMessage, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 100 });
@@ -21,14 +20,10 @@ namespace LogExCore.SingleLineConsole
             var linkOptions = new DataflowLinkOptions { PropagateCompletion = true };
             _sink.LinkTo(_renderer, linkOptions);
 
-            WithOptions(_options);
+            WithOptions(options);
         }
 
-        public void WithOptions(SingleLineConsoleLoggerOptions options)
-        {
-            _options = options;
-            _formatter = new SingleLineConsoleMessageFormatter(options);
-        }
+        public void WithOptions(SingleLineConsoleLoggerOptions options) => _formatter = new SingleLineConsoleMessageFormatter(options);
 
         public void Push(LogMessageEntry message) => _sink.Post(message);
 
@@ -38,10 +33,7 @@ namespace LogExCore.SingleLineConsole
             _renderer.Completion.ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
-        private IEnumerable<ConsoleMessage> ProcessMessage(LogMessageEntry entry)
-        {
-            return _formatter.FormatByParts(entry);
-        }
+        private IEnumerable<ConsoleMessage> ProcessMessage(LogMessageEntry entry) => _formatter.FormatMessageParts(entry);
 
         private void RenderMessage(ConsoleMessage msg)
         {
