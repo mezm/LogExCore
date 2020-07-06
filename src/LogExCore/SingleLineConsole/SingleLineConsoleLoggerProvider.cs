@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using LogExCore.Options;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
@@ -11,7 +12,7 @@ namespace LogExCore.SingleLineConsole
     {
         private readonly IOptionsMonitor<SingleLineConsoleLoggerOptions> _options;
         private readonly ConcurrentDictionary<string, SingleLineConsoleLogger> _loggers = new ConcurrentDictionary<string, SingleLineConsoleLogger>();
-        private readonly SingleLineConsoleLoggerSink _sink = new SingleLineConsoleLoggerSink();
+        private readonly SingleLineConsoleLoggerSink _sink;
 
         private readonly IDisposable _optionsReloadToken;
 
@@ -21,6 +22,7 @@ namespace LogExCore.SingleLineConsole
         {
             _options = options;
             _optionsReloadToken = _options.OnChange(ReloadOptions);
+            _sink = new SingleLineConsoleLoggerSink(_options.CurrentValue);
         }
 
         public ILogger CreateLogger(string categoryName)
@@ -36,10 +38,6 @@ namespace LogExCore.SingleLineConsole
             _loggers.Values.ToList().ForEach(x => x.WithScopeProvider(scopeProvider));
         }
 
-        private void ReloadOptions(SingleLineConsoleLoggerOptions options)
-        {
-            _sink.Options = options;
-            _loggers.Values.ToList().ForEach(x => x.WithOptions(options));
-        }
+        private void ReloadOptions(SingleLineConsoleLoggerOptions options) => _sink.WithOptions(options);
     }
 }
