@@ -15,7 +15,7 @@ namespace LogExCore.SingleLineConsole
         public SingleLineConsoleLoggerSink(SingleLineConsoleLoggerOptions options)
         {
             _renderer = new ActionBlock<ConsoleMessage>(RenderMessage);
-            _sink = new TransformManyBlock<LogMessageEntry, ConsoleMessage>(ProcessMessage, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 100 });
+            _sink = new TransformManyBlock<LogMessageEntry, ConsoleMessage>(ProcessMessage, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 100 }); // todo: think about magic number
 
             var linkOptions = new DataflowLinkOptions { PropagateCompletion = true };
             _sink.LinkTo(_renderer, linkOptions);
