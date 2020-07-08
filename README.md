@@ -1,6 +1,7 @@
-![Build and Run Tests](https://github.com/mezm/LogExCore/workflows/Build%20and%20Run%20Tests/badge.svg?branch=master)
-
 # LogExCore
+![Build and Run Tests](https://github.com/mezm/LogExCore/workflows/Build%20and%20Run%20Tests/badge.svg?branch=master)
+[![NuGet](https://img.shields.io/nuget/v/LogExCore.svg)](https://www.nuget.org/packages/LogExCore/) 
+
 **LogExCore** is a library that extends `Microsoft.Extensions.Logging`.
 Now it contains only `SingleLineConsoleLogger`. But there are plans to add few more, for example `FileLogger`
 
