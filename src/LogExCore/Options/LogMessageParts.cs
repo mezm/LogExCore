@@ -20,6 +20,10 @@
         /// <summary>
         /// Message itself 
         /// </summary>
-        Message
+        Message,
+        /// <summary>
+        /// Exception
+        /// </summary>
+        Exception
     }
 }

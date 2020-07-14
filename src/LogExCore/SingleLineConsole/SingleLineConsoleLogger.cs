@@ -27,7 +27,7 @@ namespace LogExCore.SingleLineConsole
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             var message = formatter(state, exception);
-            var entry = new LogMessageEntry(DateTime.Now, logLevel, _name, message);
+            var entry = new LogMessageEntry(DateTime.Now, logLevel, _name, message, exception);
             _sink.Push(entry);
         }
     }
