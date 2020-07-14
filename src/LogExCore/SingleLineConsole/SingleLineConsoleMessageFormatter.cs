@@ -83,6 +83,11 @@ namespace LogExCore.SingleLineConsole
             }
 
             yield return new ConsoleMessage(entry.Message, highlightColor, newLine: true);
+
+            if (entry.Exception != null && !_options.Hide.Contains(LogMessageParts.Exception))
+            {
+                yield return new ConsoleMessage(entry.Exception.ToString(), highlightColor, newLine: true);
+            }
         }
 
         private static string GetDateTimeFormat(TimestampFormat format)

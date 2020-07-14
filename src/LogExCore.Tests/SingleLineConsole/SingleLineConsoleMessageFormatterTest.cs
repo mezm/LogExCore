@@ -21,7 +21,8 @@ namespace LogExCore.Tests.SingleLineConsole
                     x.Dates.BeforeNow(), 
                     LogLevel.Information, 
                     "LogExCore.Tests.SingleLineConsole.SingleLineConsoleMessageFormatterTest", 
-                    x.Strings.Any()));
+                    x.Strings.Any(),
+                    null));
         }
 
         [TestCase(TimestampFormat.Time, @"\d{2}:\d{2}:\d{2}")]
@@ -109,6 +110,35 @@ namespace LogExCore.Tests.SingleLineConsole
             var messages = formatter.FormatMessageParts(Bot.Build<LogMessageEntry>());
 
             messages.Should().HaveCount(4);
+        }
+
+        [Test]
+        public void FormatMessageParts_HideException_ExceptionDetailsShouldBeSkipped()
+        {
+            var formatter = CreateFormatter(x => x.Hide = new LogMessageParts[] { LogMessageParts.Exception });
+
+            var ex = new Exception("Test exception");
+            var entry = Bot.BuildCustom(x => new LogMessageEntry(x.Keep<DateTime>(), x.Keep<LogLevel>(), x.Keep<string>(), "message", ex));
+            var messages = formatter.FormatMessageParts(entry);
+
+            messages.Should().HaveCount(4);
+            messages.Last().Text.TrimEnd().Should().Be("message");
+        }
+
+        [Test]
+        public void FormatMessageParts_WithException_ExceptionShouldBeFromNewLine()
+        {
+            var formatter = CreateFormatter(x => { });
+
+            var ex = new Exception("Test exception");
+            var entry = Bot.BuildCustom(x => new LogMessageEntry(x.Keep<DateTime>(), x.Keep<LogLevel>(), x.Keep<string>(), x.Keep<string>(), ex));
+            var messages = formatter.FormatMessageParts(entry);
+
+            messages.Should().HaveCount(5);
+            messages.Skip(3).First().NewLine.Should().BeTrue();
+            messages.Last().Text.Should().Contain("Test exception");
+            messages.Last().ForegroundColor.Should().NotBeNull();
+            messages.Last().NewLine.Should().BeTrue();
         }
 
         private static SingleLineConsoleMessageFormatter CreateFormatter(Action<SingleLineConsoleLoggerOptions> configAction)
